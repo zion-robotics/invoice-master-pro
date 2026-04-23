@@ -1,138 +1,161 @@
-📄 Invoice Management App
+# Invoice Master Pro
 
-🚀 Overview
-This is a full-stack Invoice Management Application built with React, based on the provided Figma design. The app allows users to manage invoices efficiently with full CRUD functionality, status tracking, filtering, and theme customization.
+A fully responsive Invoice Management Application built with React, TypeScript, and Tailwind CSS.
 
-✨ Features
-Create, read, update, and delete invoices
+## Live Demo
 
-Save invoices as Draft
+[View Live App](https://your-deployment-url.vercel.app) <!-- Replace with your Vercel/Netlify URL -->
 
-Mark invoices as Paid
+## GitHub Repository
 
-Filter invoices by status (All, Draft, Pending, Paid)
+(https://github.com/zion-robotics/invoice-master-pro)
 
-Light/Dark mode toggle (persisted across sessions)
+---
 
-Fully responsive design (mobile, tablet, desktop)
+## Setup Instructions
 
-Form validation with error handling
+### Prerequisites
 
-Hover and interactive states
+- Node.js 18+ or Bun
+- npm, yarn, or bun
 
-Confirmation modal for deletion
+### Installation
 
-Persistent data storage
+```bash
+# Clone the repository
+git clone https://github.com/zion-robotics/invoice-master-pro.git
+cd invoice-master-pro
 
-🛠️ Tech Stack
-Frontend: React 
-
-State Management: React Context / useState
-
-Styling: CSS / Styled Components / Tailwind
-
-⚙️ Setup Instructions
-1. Clone the repository
-git clone https://github.com/your-username/invoice-app.git
-cd invoice-app
-2. Install dependencies
+# Install dependencies
 npm install
-3. Run the development server
-npm run dev
-4. Open in browser
-http://localhost:5173
-🧱 Architecture
-The application follows a component-based architecture:
+# or
+bun install
 
+# Start the development server
+npm run dev
+# or
+bun dev
+```
+
+The app will be available at `http://localhost:5173`
+
+### Build for Production
+
+```bash
+npm run build
+# or
+bun run build
+```
+
+### Run Tests
+
+```bash
+npm run test
+# or
+bun test
+```
+
+---
+
+## Architecture
+
+### Tech Stack
+
+- **React 18** — UI library with hooks
+- **TypeScript** — static typing throughout
+- **Tailwind CSS** — utility-first styling
+- **shadcn/ui** — accessible UI primitives
+- **React Router v6** — client-side routing
+- **Zod** — runtime form validation
+- **date-fns** — date formatting and arithmetic
+- **Vite** — build tool and dev server
+
+### Project Structure
+
+```
 src/
-│
 ├── components/
-│   ├── InvoiceForm.jsx
-│   ├── InvoiceItem.jsx
-│   ├── StatusBadge.jsx
-│   ├── Filter.jsx
-│   ├── Modal.jsx
+│   ├── ui/                  # shadcn/ui primitives (button, dialog, etc.)
+│   ├── DeleteDialog.tsx     # Confirmation modal before deletion
+│   ├── EmptyState.tsx       # Shown when no invoices match filter
+│   ├── InvoiceCard.tsx      # Single invoice row in the list
+│   ├── InvoiceForm.tsx      # Create / edit invoice drawer form
+│   ├── ListHeader.tsx       # Title, filter dropdown, new invoice button
+│   ├── Sidebar.tsx          # Navigation sidebar with theme toggle
+│   └── StatusBadge.tsx      # Colour-coded draft / pending / paid badge
+│
+├── hooks/
+│   ├── useInvoices.ts       # Reactive store — useSyncExternalStore over localStorage
+│   └── useTheme.ts          # Light/dark mode toggle with localStorage persistence
+│
+├── lib/
+│   ├── format.ts            # formatDate, formatMoney helpers
+│   ├── seed.ts              # Initial seed data for first load
+│   ├── storage.ts           # All localStorage read/write operations (CRUD)
+│   ├── types.ts             # Invoice, InvoiceItem, Address, InvoiceStatus types
+│   └── utils.ts             # cn() class merging utility
 │
 ├── pages/
-│   ├── InvoiceList.jsx
-│   ├── InvoiceDetail.jsx
+│   ├── Index.tsx            # Invoice list page with status filtering
+│   ├── InvoiceDetail.tsx    # Single invoice view with edit/delete/mark paid
+│   └── NotFound.tsx         # 404 fallback
 │
-├── context/
-│   ├── ThemeContext.jsx
-│   ├── InvoiceContext.jsx
-│
-├── utils/
-│   ├── validation.js
-│   ├── storage.js
-│
-└── App.jsx
-Key Design Decisions:
-Context API used for global state (invoices + theme)
+└── App.tsx                  # Router setup and layout shell
+```
 
-LocalStorage used for persistence
+### Data Flow
 
-Separation of concerns between UI, logic, and state
+```
+localStorage
+     ↕
+storage.ts  (getAllInvoices, saveInvoice, deleteInvoice, updateStatus)
+     ↕
+useInvoices.ts  (useSyncExternalStore + notifyInvoicesChanged)
+     ↕
+React components (Index, InvoiceDetail, InvoiceForm)
+```
 
-⚖️ Trade-offs
-1. LocalStorage vs Backend
-✅ Faster to implement
+All state lives in `localStorage`. The `useInvoices` hook uses React's `useSyncExternalStore` to subscribe to a custom event bus (`notifyInvoicesChanged`). Any write operation calls `notify()`, which triggers a re-render in all subscribed components — no Context Provider or Redux needed.
 
-❌ No cross-device sync
+### Key Design Decisions
 
-❌ No real multi-user support
+- **`useSyncExternalStore`** over Context/Redux — avoids unnecessary re-renders and keeps the store logic outside React's tree
+- **Single `useInvoice(id)` hook** in the detail page — eliminates dual state (a `useState` + a store subscription), which was the root cause of stale UI after edits
+- **Zod validation** — schema-first validation with per-field error paths mapped directly to form field keys
+- **Snapshot caching** — the store caches the last serialised string so `JSON.stringify` only runs when data actually changes
 
-Chosen for speed and simplicity within assignment constraints.
+---
 
-2. No Authentication
-✅ Matches Figma design exactly
+## Trade-offs
 
-✅ Simpler user flow
+| Decision | Benefit | Trade-off |
+|---|---|---|
+| localStorage only | Zero backend setup, works offline, fast | Data is device-local, no multi-device sync |
+| useSyncExternalStore | Concurrent-mode safe, no provider needed | Slightly more boilerplate than Context |
+| shadcn/ui primitives | Accessible, unstyled, fully owned code | Larger initial component footprint |
+| Zod for validation | Type-safe, composable schemas | Adds ~13KB to bundle |
+| Vite + Bun | Very fast dev/build | Bun lock file can cause issues on some CI environments |
 
-❌ No user-specific data
+---
 
-3. Client-side State Management
-✅ Lightweight (no Redux needed)
+## Accessibility Notes
 
-❌ Can become harder to scale
+- **Semantic HTML** — all sections use proper landmark elements (`<main>`, `<nav>`, `<address>`)
+- **Form labels** — every input is paired with a visible `<label>` element
+- **Buttons** — all interactive controls use `<button>` elements, never `<div>` or `<span>`
+- **Delete modal** — uses the native `AlertDialog` from shadcn/ui which traps focus, closes on `ESC`, and sets `aria-modal="true"`
+- **Invoice form drawer** — listens for `ESC` keydown to close, sets `aria-modal="true"` and `role="dialog"` with a descriptive `aria-label`
+- **Status badges** — colour alone is not the only indicator; text label is always present for screen readers
+- **Keyboard navigation** — all interactive elements are reachable via `Tab` and activatable via `Enter`/`Space`
+- **Color contrast** — both light and dark themes are designed to meet WCAG AA contrast ratios (4.5:1 for normal text)
+- **Disabled states** — the "Mark as Paid" button uses `disabled` attribute with reduced opacity, not just visual styling
 
-♿ Accessibility Notes
-Semantic HTML elements used (<button>, <form>, <label>)
+---
 
-All inputs properly labeled
+## Features Beyond Requirements
 
-Modal:
-
-Traps focus
-
-Closes with ESC
-
-Keyboard navigable
-
-Sufficient color contrast for both light and dark themes (WCAG AA)
-
-Interactive elements have visible focus and hover states
-
-🚀 Improvements (Future Work)
-Add authentication (user accounts)
-
-Connect to a real backend (e.g., Supabase / Node.js)
-
-Add pagination for large datasets
-
-Export invoices as PDF
-
-Add search functionality
-
-Improve performance with memoization
-
-📦 Deployment
-Live URL: (add your Vercel/Netlify link here)
-
-GitHub Repo: (https://github.com/zion-robotics/invoice-master-pro)
-
-📝 Notes
-App is pre-seeded with sample invoices for better demo experience
-
-Data persists across reload using supabase
-
-Designed to closely match the provided Figma UI
+- **Seed data on first load** — the app populates with realistic sample invoices so reviewers see a working state immediately without manual data entry
+- **Snapshot caching** in `useInvoices` — prevents unnecessary re-renders by only re-parsing localStorage when data actually changes
+- **Reactive single-invoice hook** (`useInvoice(id)`) — the detail page auto-updates on any change without manual state syncing
+- **Mobile sticky action bar** — edit/delete/mark-paid buttons stick to the bottom of the screen on mobile for thumb-friendly access
+- **Payment terms select** — 1, 7, 14, 30 day options with automatic `paymentDue` date calculation
