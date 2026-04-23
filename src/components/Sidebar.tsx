@@ -1,6 +1,7 @@
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { Link, useLocation } from "react-router-dom";
+import profilePic from "@/assets/zion complete prof pics.png";
 
 export function Sidebar() {
   const { theme, toggle } = useTheme();
@@ -30,9 +31,14 @@ export function Sidebar() {
           {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
         </button>
         <div className="md:w-full w-px md:h-px h-10 bg-surface-detail" aria-hidden />
-        <div className="md:w-10 md:h-10 w-9 h-9 rounded-full bg-gradient-to-br from-muted-foreground to-text-secondary md:mt-2 md:mb-0" aria-label="User avatar" />
+
+        {/* ✅ Profile photo replacing the placeholder circle */}
+        <img
+          src={profilePic}
+          alt="Zion's avatar"
+          className="md:w-10 md:h-10 w-9 h-9 rounded-full object-cover object-top md:mt-2 md:mb-0"
+        />
       </div>
-      {/* hidden marker just to keep linter happy when isHome unused */}
       <span className="hidden">{isHome ? "" : ""}</span>
     </aside>
   );
