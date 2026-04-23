@@ -1,16 +1,39 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useMemo, useState } from "react";
+import { useInvoices } from "@/hooks/useInvoices";
+import { ListHeader } from "@/components/ListHeader";
+import { InvoiceCard } from "@/components/InvoiceCard";
+import { EmptyState } from "@/components/EmptyState";
+import { InvoiceForm } from "@/components/InvoiceForm";
+import type { InvoiceStatus } from "@/lib/types";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
+  const invoices = useInvoices();
+  const [filters, setFilters] = useState<InvoiceStatus[]>([]);
+  const [formOpen, setFormOpen] = useState(false);
+
+  const filtered = useMemo(
+    () => (filters.length === 0 ? invoices : invoices.filter((i) => filters.includes(i.status))),
+    [invoices, filters],
+  );
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="max-w-[730px] mx-auto px-6 md:px-10 py-8 md:py-16">
+      <ListHeader
+        count={filtered.length}
+        filters={filters}
+        onFiltersChange={setFilters}
+        onNew={() => setFormOpen(true)}
+      />
+      {filtered.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <div className="space-y-4">
+          {filtered.map((inv) => <InvoiceCard key={inv.id} invoice={inv} />)}
+        </div>
+      )}
+      <InvoiceForm open={formOpen} onClose={() => setFormOpen(false)} />
     </div>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
