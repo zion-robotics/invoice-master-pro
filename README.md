@@ -1,10 +1,10 @@
-# Invoice Master Pro
+# Invoice Management App
 
 A fully responsive Invoice Management Application built with React, TypeScript, and Tailwind CSS.
 
 ## Live Demo
 
-[View Live App](https://your-deployment-url.vercel.app) <!-- Replace with your Vercel/Netlify URL -->
+[View Live App](https://zion-robotics.github.io/invoice-master-pro/) <!-- Replace with your Vercel/Netlify URL -->
 
 ## GitHub Repository
 
