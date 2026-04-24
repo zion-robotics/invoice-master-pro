@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "homepage": "https://YOUR_GITHUB_USERNAME.github.io/invoice-master-pro/",
+  "homepage": "https://zion-robotics.github.io/invoice-master-pro/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
